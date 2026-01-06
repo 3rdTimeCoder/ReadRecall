@@ -17,7 +17,8 @@ class EPubLoader:
         """
         self.file_path = file_path
 
-    def get_value(book: epub.EpubBook, key: str) -> str:
+
+    def _get_value(self, book: epub.EpubBook, key: str) -> str:
         """Returns the value of the given key inside the epub's metadata
         Args:
             book: The epub we want to extract metadata from
@@ -28,12 +29,26 @@ class EPubLoader:
         data = book.get_metadata('DC', key)
         if len(data) <= 0 or len(data[0]) <= 0: return ""
         return book.get_metadata('DC', key)[0][0]
-    
-    def get_metadata() -> dict:
-        """Extracts and returns the metadata from an epub file"""
-        metadata = dict()
-        #TODO
 
+
+    def _parse_html(self, html: str) -> str:
+        """Returns html as text"""
+        soup = BeautifulSoup(html, "html.parser")
+        text = soup.get_text('\n')
+        return text
+    
+    
+    def get_metadata(self, book: epub.EpubBook) -> dict:
+        """Extracts and returns the metadata from an epub file"""
+        metadata = {
+            'title': self._get_value(book, 'title'),
+            'author': self._get_value(book, 'creator'),
+            'publisher': self._get_value(book, 'publisher'),
+            'description': self._parse_html(self._get_value(book, 'description'))
+            #TODO: add cover-img later on for frontend
+        }
+        
+        return metadata
 
 
     def load(self):
@@ -43,18 +58,12 @@ class EPubLoader:
             raise FileNotFoundError(f"Error while loading file {os.path.basename(self.file_path)}. File not found.")
         
         book = epub.read_epub(self.file_path)
+        metadata = self.get_metadata(book)
+        print(f"metadata: {metadata}")
+
         text_data = []
-        metadata = dict()
-
-        print(f"title: {book.get_metadata('DC', 'title')[0][0]}")
-        print(f"author: {book.get_metadata('DC', 'creator')[0][0]}")
-        print(f"publisher: {book.get_metadata('DC', 'publisher')}") #Most fanfiction will have the publisher 'Archive of our own'
-        print(f"desc: {book.get_metadata('DC', 'description')}")
-        # print(f"book cover: {book.get_item_with_id('cover-image').get_content()}")
-
         for item in book.get_items_of_type(ebooklib.ITEM_DOCUMENT):
-            soup = BeautifulSoup(item.get_content(), "html.parser")
-            text = soup.get_text('\n')
+            text = self._parse_html(item.get_content())
             text_data.append(text)
         
         full_text = "\n".join(text_data)
@@ -67,7 +76,7 @@ class EPubLoader:
 
 def main():
     doc = EPubLoader("../../test-docs/The Faithless (C. L. Clark) (Z-Library).epub")
-    # doc = EPubLoader("../../test-docs/I_Remember_Our_Love.epub")
+    # doc = EPubLoader("../../test-docs/Behind_the_Locked_Door.epub")
     data = doc.load()
 
 
