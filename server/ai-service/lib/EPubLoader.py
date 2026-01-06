@@ -4,8 +4,70 @@ from pathlib import Path
 from ebooklib import epub
 import ebooklib
 from bs4 import BeautifulSoup
-from Section import Section
-from Document import Document
+
+
+class Section:
+
+    def __init__(self, metadata, content):
+        """
+        Args:
+            metadata: The given section's metadata
+            content: The given section's text content
+        """
+        self.metadata = metadata
+        self.content = content
+
+    
+    def get_metadata(self):
+        """Returns Section's metadata: 
+        The book title, author, publisher and chapter
+        """
+        return self.metadata
+    
+
+    def get_content(self):
+        """Returns the Section's content"""
+        return self.content
+    
+    
+    def __str__(self):
+        return f"Section(metadata: {self.metadata}, content: {self.content[:100]}...)"
+    
+    
+    def __repr__(self):
+        return f"Section(metadata: {self.metadata}, content: {self.content[:100]}...)"
+
+
+class Document:
+
+    def __init__(self, metadata, sections):
+        """
+        Args:
+            metadata: The epub's metadata
+            sections: A list of the epub's different sections
+        """
+        self.metadata = metadata
+        self.sections = sections
+
+    
+    def get_metadata(self):
+        """Returns the Documents's metadata: 
+        The book title, author, publisher and description
+        """
+        return self.metadata
+    
+
+    def get_sections(self):
+        """Returns a list of the Document's sections"""
+        return self.sections
+    
+    
+    def __str__(self):
+        return f"Document(metadata: {self.metadata}, sections: {self.sections})"
+    
+    
+    def __repr__(self):
+        return f"Document(metadata: {self.metadata}, sections: {self.sections})"
 
 
 class EPubLoader:
@@ -46,7 +108,7 @@ class EPubLoader:
             'title': self._get_value(book, 'title'),
             'author': self._get_value(book, 'creator'),
             'publisher': self._get_value(book, 'publisher'),
-            'description': self._parse_html(self._get_value(book, 'description'))
+            'description': self._parse_html(self._get_value(book, 'description')),
             #TODO: add cover-img later on for frontend
         }
         
@@ -83,8 +145,8 @@ class EPubLoader:
 
 
 def main():
-    # doc = EPubLoader("../../test-docs/Behind_the_Locked_Door.epub")
-    doc = EPubLoader("../../test-docs/I_Remember_Our_Love.epub")
+    # doc = EPubLoader("../test-docs/Behind_the_Locked_Door.epub")
+    doc = EPubLoader("../test-docs/I_Remember_Our_Love.epub")
     data = doc.load()
 
 

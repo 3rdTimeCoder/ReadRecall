@@ -1,5 +1,6 @@
 import os
-from langchain_community.document_loaders import PyPDFLoader, UnstructuredEPubLoader, DirectoryLoader
+from langchain_community.document_loaders import PyPDFLoader
+from lib import EPubLoader, DirectoryLoader
 
 
 def load_doc(doc: str, type="epub"):
@@ -10,7 +11,7 @@ def load_doc(doc: str, type="epub"):
         raise FileNotFoundError(f"path {doc} not found. Please ensure that the specified document exists.")
 
     if (type == "epub"):
-        loader = UnstructuredEPubLoader(doc)
+        loader = EPubLoader(doc)
         data = loader.load()
         return data
     elif (type == "pdf"):
@@ -28,7 +29,7 @@ def load_docs(dir: str, type="epub", debug_mode=False):
     if not os.path.exists(dir):
         raise FileNotFoundError(f"path {dir} not found. Please ensure that the specified document exists.")
     
-    loader_cls = UnstructuredEPubLoader if type == "epub" else PyPDFLoader
+    loader_cls = EPubLoader if type == "epub" else PyPDFLoader
     loader = DirectoryLoader(
         path=dir,
         glob=f"*.{type}",
@@ -42,8 +43,10 @@ def load_docs(dir: str, type="epub", debug_mode=False):
     
     if debug_mode:
         for i, doc in enumerate(docs[:5]):
-            print(f"{i+1}. Source: {doc.metadata['source']}\nCharacters: {len(doc.page_content)}")
-            print(f"Preview: {doc.page_content.strip()[:300]}...\nMetadata: {doc.metadata}\n")
+            # print(f"{i+1}. Source: {doc.metadata['source']}\nCharacters: {len(doc.page_content)}")
+            # print(f"Preview: {doc.page_content.strip()[:300]}...\nMetadata: {doc.metadata}\n")
+            print(f"{i+1}. Source: {doc.metadata['title']}\nAuthor: {doc.metadata['author']}")
+            print(f"Metadata: {doc.metadata}\n")
 
     
     return docs
@@ -51,12 +54,12 @@ def load_docs(dir: str, type="epub", debug_mode=False):
     
 def main():
     print("loader.py main running...")
-    data = load_doc("../test-docs/The Faithless (C. L. Clark) (Z-Library).epub", type="epub")
-    print(data)
+    # data = load_doc("./test-docs/I_Remember_Our_Love.epub", type="epub")
+    # print(data)
     # print(f"Pages: {len(data)}")
-    print(f"Total characters: {len(data[0].page_content)}")
+    # print(f"Total characters: {len(data[0].page_content)}")
 
-    # load_docs("../test-docs", type="epub", debug_mode=True)
+    load_docs("./test-docs", type="epub", debug_mode=True)
 
 
 if __name__ == "__main__":
