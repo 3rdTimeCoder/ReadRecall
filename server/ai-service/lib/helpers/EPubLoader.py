@@ -4,6 +4,8 @@ from pathlib import Path
 from ebooklib import epub
 import ebooklib
 from bs4 import BeautifulSoup
+from Section import Section
+from Document import Document
 
 
 class EPubLoader:
@@ -52,26 +54,18 @@ class EPubLoader:
 
 
     def _split_text_into_chapters(self, book: epub.EpubBook) -> list: 
-        # TODO: return as list of "objects(JS terminology)", each object being a separate chapter, that look like this:
-        # {'metadata': normal metadata excluding description and cover_img, 'content': the actual chapter text content}
+        """TODO: write docstring"""
         doc_data = []
-        _metadata = self.get_metadata(book)
-        _metadata.pop('description')
-        for item in book.get_items_of_type(ebooklib.ITEM_DOCUMENT):
-            # print(f"item: {item}")
-            text = self._parse_html(item.get_content())
-            # print(f"item_preview: {text.strip()[:100]}\n")
-            _metadata['chapter']  = text.strip()[:100].split('\n')[0]
-            # print(text.strip()[:100].split('\n'))
-            # print('\n\n')
-           
+        metadata = self.get_metadata(book)
+        metadata.pop('description')
 
-            doc_data.append({
-                'metadata': _metadata,
-                'content': text.strip()
-            })
+        for item in book.get_items_of_type(ebooklib.ITEM_DOCUMENT):
+            text = self._parse_html(item.get_content())
+            updated_metadata = { **metadata, 'chapter':  text.strip()[:100].split('\n')[0] }
+            doc_data.append(Section(updated_metadata, text.strip()))
 
         return doc_data
+    
 
     def load(self):
         """Extracts and returns the text from an epub file
@@ -80,31 +74,17 @@ class EPubLoader:
             raise FileNotFoundError(f"Error while loading file {os.path.basename(self.file_path)}. File not found.")
         
         book = epub.read_epub(self.file_path)
-        # toc = book.toc
-        # print(f"toc: {toc}")
         metadata = self.get_metadata(book)
-        print(f"metadata: {metadata}")
 
-        doc_data = self._split_text_into_chapters(book)
-        print(doc_data)
-        # for item in book.get_items_of_type(ebooklib.ITEM_DOCUMENT):
-        #     print(f"item: {item}")
-        #     text = self._parse_html(item.get_content())
-        #     text_data.append(text)
-        
-        # full_text = "\n".join(text_data)
-        
-
-        # print(f"characters: {len(full_text)}")
-        # print(f"preview: {full_text.strip()[:500]}")
+        doc_sections = self._split_text_into_chapters(book)
+        doc_data = Document(metadata, doc_sections)
+        return doc_data
         
 
 
 def main():
-    # doc = EPubLoader("../../test-docs/The Faithless (C. L. Clark) (Z-Library).epub")
     # doc = EPubLoader("../../test-docs/Behind_the_Locked_Door.epub")
-    # doc = EPubLoader("../../test-docs/I_Remember_Our_Love.epub")
-    doc = EPubLoader("../../ingestion/Those Who Wait (Haley Cass) (Z-Library).epub")
+    doc = EPubLoader("../../test-docs/I_Remember_Our_Love.epub")
     data = doc.load()
 
 
