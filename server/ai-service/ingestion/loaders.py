@@ -17,9 +17,8 @@ def load_doc(doc: str, type="epub"):
     elif (type == "pdf"):
         loader = PyPDFLoader(doc)
         data = loader.load()
-        return data
-    else:
-        return None  
+        return data[0]
+    else: raise Exception(f"Unsupported file type: {type}")
     
     
 def load_docs(dir: str, type="epub", debug_mode=False):

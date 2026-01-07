@@ -2,6 +2,7 @@ import os
 from typing import Union
 from pathlib import Path
 from lib.EPubLoader import EPubLoader
+from lib.Document import Document
 
 
 class DirectoryLoader: 
@@ -18,7 +19,7 @@ class DirectoryLoader:
         return files
 
 
-    def _load_files(self, files: list) -> list:
+    def _load_files(self, files: list) -> list[Document]:
         docs = []
         """TODO: write docstring"""
         for f in files:

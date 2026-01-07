@@ -1,6 +1,6 @@
 import os
 from dotenv import load_dotenv
-from ingestion.loader import load_docs
+from ingestion.loaders import load_docs
 
 
 load_dotenv()

@@ -115,7 +115,7 @@ class EPubLoader:
         return metadata
 
 
-    def _split_text_into_chapters(self, book: epub.EpubBook) -> list: 
+    def _split_text_into_chapters(self, book: epub.EpubBook) -> list[Section]: 
         """TODO: write docstring"""
         doc_data = []
         metadata = self.get_metadata(book)
