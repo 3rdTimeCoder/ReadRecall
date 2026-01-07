@@ -28,7 +28,7 @@ def update_metadata(chunk: LCDocument, new_entry) -> LCDocument:
     return updated_chunk
     
 
-def chunk_doc(doc: Document) -> list[LCDocument]:
+def chunk_doc(doc: Document, debug_mode=False) -> list[LCDocument]:
     """TODO: write docstring"""
     chunks = []
     sections = doc.get_sections()
@@ -41,13 +41,18 @@ def chunk_doc(doc: Document) -> list[LCDocument]:
     for i,chunk in enumerate(chunks):
         updated_chunk = update_metadata(chunk, {'chunk_index': i+1, 'chunks_in_book': chunks_in_book})
         chunks[i] = updated_chunk
-        print(f"\nchunk {i + 1}: {chunks[i]}")
-        print(f"chars: {len(chunks[i].page_content)}")
+        if debug_mode:
+            print(f"\nchunk {i + 1}: {chunks[i]}")
+            print(f"chars: {len(chunks[i].page_content)}")
 
     return chunks
 
 
-def chunk_docs(docs: list[Document]):
+def chunk_docs(docs: list[Document], debug_mode=False):
     """TODO: write docstring"""
-    pass
+    chunks = []
+    for doc in docs:
+        chunks.extend(chunk_doc(doc, debug_mode=debug_mode))
+
+    return chunks
 
