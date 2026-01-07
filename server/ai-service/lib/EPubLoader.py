@@ -4,6 +4,7 @@ from pathlib import Path
 from ebooklib import epub
 import ebooklib
 from bs4 import BeautifulSoup
+from uuid import uuid4
 
 
 class Section:
@@ -40,7 +41,7 @@ class Section:
 
 class Document:
 
-    def __init__(self, metadata, sections):
+    def __init__(self, metadata, sections: list[Section]):
         """
         Args:
             metadata: The epub's metadata
@@ -105,6 +106,7 @@ class EPubLoader:
     def get_metadata(self, book: epub.EpubBook) -> dict:
         """Extracts and returns the metadata from an epub file"""
         metadata = {
+            'book_id': str(uuid4()),
             'title': self._get_value(book, 'title'),
             'author': self._get_value(book, 'creator'),
             'publisher': self._get_value(book, 'publisher'),
@@ -119,7 +121,7 @@ class EPubLoader:
         """TODO: write docstring"""
         doc_data = []
         metadata = self.get_metadata(book)
-        metadata.pop('description')
+        # metadata.pop('description') # Commenting this out because I think its beneficial for each chunk to contain the book's description
 
         for item in book.get_items_of_type(ebooklib.ITEM_DOCUMENT):
             text = self._parse_html(item.get_content())

@@ -1,23 +1,53 @@
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from lib.Document import Document
+from langchain_core.documents import Document as LCDocument
 
-def split_text(text: str) -> list:
+
+def split_text(text: str, metadata) -> list[LCDocument]:
     """TODO: write docstring"""
     text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=1000,
+        chunk_size=10000,
         chunk_overlap=200,
         add_start_index=True
     )
 
-    chunks = text_splitter.split_documents(text)
+    chunks = text_splitter.split_documents([LCDocument(
+        page_content=text,
+        metadata=metadata
+    )])
 
-    print(f"\nchunk {i + 1}: {chunk}" for i,chunk in enumerate(chunks))
+    return chunks
 
 
-def chunk_doc(doc: Document):
-    # Reminder:
-    # Each document has the structure (metadata : metadata, sections: sections)
-    # Each section has the structure (metadata: metadata, content: content)
-    # *metadata in section = the normal book metadata excl. desc & incl. chapter
-    # So a Document contains a list of sections (chapters) and each section contains metadata (incl. chapter) and the actual content of that section which is just plain text
+def update_metadata(chunk: LCDocument, new_entry) -> LCDocument:
+    updated_chunk = LCDocument(
+        page_content=chunk.page_content,
+        metadata={**chunk.metadata, **new_entry}
+    )
+
+    return updated_chunk
+    
+
+def chunk_doc(doc: Document) -> list[LCDocument]:
+    """TODO: write docstring"""
+    chunks = []
+    sections = doc.get_sections()
+
+    for section in sections:
+        chunks.extend(split_text(section.get_content(), section.get_metadata()))
+    
+    chunks_in_book = len(chunks)
+
+    for i,chunk in enumerate(chunks):
+        updated_chunk = update_metadata(chunk, {'chunk_index': i+1, 'chunks_in_book': chunks_in_book})
+        chunks[i] = updated_chunk
+        print(f"\nchunk {i + 1}: {chunks[i]}")
+        print(f"chars: {len(chunks[i].page_content)}")
+
+    return chunks
+
+
+def chunk_docs(docs: list[Document]):
+    """TODO: write docstring"""
     pass
+

@@ -1,8 +1,11 @@
 
+from uuid import uuid4
+from lib.Section import Section
+
 
 class Document:
 
-    def __init__(self, metadata, sections):
+    def __init__(self, metadata, sections: list[Section]):
         """
         Args:
             metadata: The epub's metadata
