@@ -31,9 +31,8 @@ def load_docs(dir: str, type="epub", debug_mode=False):
     
     loader_cls = EPubLoader if type == "epub" else PyPDFLoader
     loader = DirectoryLoader(
-        path=dir,
-        glob=f"*.{type}",
-        loader_cls=loader_cls
+        dir_path=dir,
+        loader=loader_cls
     )
 
     docs = loader.load()
@@ -42,7 +41,7 @@ def load_docs(dir: str, type="epub", debug_mode=False):
         raise FileNotFoundError(f"No .{type} files found. Please add documents.") 
     
     if debug_mode:
-        for i, doc in enumerate(docs[:5]):
+        for i, doc in enumerate(docs[:9]):
             # print(f"{i+1}. Source: {doc.metadata['source']}\nCharacters: {len(doc.page_content)}")
             # print(f"Preview: {doc.page_content.strip()[:300]}...\nMetadata: {doc.metadata}\n")
             print(f"{i+1}. Source: {doc.metadata['title']}\nAuthor: {doc.metadata['author']}")

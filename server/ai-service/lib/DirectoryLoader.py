@@ -1,6 +1,7 @@
 import os
 from typing import Union
 from pathlib import Path
+from lib.EPubLoader import EPubLoader
 
 
 class DirectoryLoader: 
@@ -11,21 +12,35 @@ class DirectoryLoader:
 
 
     def _get_files(self):
-        """Return list of file_paths (files) in directory"""
-        pass
+        """Return list of files in directory"""
+        path = Path(self.dir_path)
+        files = [p for p in path.iterdir() if p.is_file()]
+        return files
 
 
     def _load_files(self, files: list) -> list:
         docs = []
-        """TODO: loop through files array and load each doc using loader and append to docs array"""
-        pass
+        """TODO: write docstring"""
+        for f in files:
+            loader = self.loader(Path(f))
+            f_data = loader.load()
+            docs.append(f_data)
+
+        return docs
     
 
     def load(self):
-        # 1. get list of file_paths
+        """TODO: write docstring"""
         files = self._get_files()
-        print(f"files: {files}")
-        # 2. loop through file_paths and use loader to load them one by one and append each to the docs array
         docs = self._load_files(files)
-        
         return docs
+
+
+def main():
+    d = DirectoryLoader("./test-docs", EPubLoader)
+    d.load()
+
+
+
+if __name__ == "__main__":
+    main()
