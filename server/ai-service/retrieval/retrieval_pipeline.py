@@ -25,22 +25,24 @@ def get_top_matching_chunks(query: str, debug_mode=False) -> list[Document]:
     return chunks
 
 
+# def calculate_score(book: Document)
+
 def get_book_suggestions(chunks: list[Document]) -> list[Document]:
-    book_count = {}
+    book_hits = {}
     book_info = {}
     book_suggestions = {}
     
     for chunk in chunks:
         metadata = chunk.metadata
         book = metadata['book_id']
-        if book_count.get(metadata['book_id']):
-            book_count[book] = book_count[book] + 1
+        if book_hits.get(metadata['book_id']):
+            book_hits[book] = book_hits[book] + 1
         else:
-            book_count[book] = 1
+            book_hits[book] = 1
             book_info[book] = metadata
     
-    ordered_book_count = dict(sorted(book_count.items(), key=lambda item: item[1], reverse=True))
-    top_match_id = list(ordered_book_count)[0]
+    ordered_book_hits = dict(sorted(book_hits.items(), key=lambda item: item[1], reverse=True))
+    top_match_id = list(ordered_book_hits)[0]
     top_match_info = book_info[top_match_id]
     book_suggestions['top_match'] = top_match_info
 
@@ -50,10 +52,10 @@ def get_book_suggestions(chunks: list[Document]) -> list[Document]:
 
     other_suggestions = []
 
-    if len(ordered_book_count) > 1:
+    if len(ordered_book_hits) > 1:
         print(f"\nOther suggestions:\n")
 
-        for i, key in enumerate(ordered_book_count.keys()):
+        for i, key in enumerate(ordered_book_hits.keys()):
             if i == 0: continue
             other_suggestions.append(book_info[key])
 
