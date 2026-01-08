@@ -22,6 +22,6 @@ def query_db(query: str, k=5, threshold=0.3) -> list[Tuple[Document, float]]:
         query=query,
         k=k
     )
-    results_above_threshold = [(doc, score) for doc,score in results if score >= threshold]
+    results_above_threshold = [(chunk, score) for chunk,score in results if score >= threshold]
 
     return results_above_threshold
