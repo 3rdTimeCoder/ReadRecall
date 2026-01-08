@@ -32,19 +32,19 @@ def get_book_suggestions(chunks: list[Document]) -> list[Document]:
     
     for chunk in chunks:
         metadata = chunk.metadata
-        book = metadata['title']
-        if book_count.get(metadata['title']):
+        book = metadata['book_id']
+        if book_count.get(metadata['book_id']):
             book_count[book] = book_count[book] + 1
         else:
             book_count[book] = 1
             book_info[book] = metadata
     
     ordered_book_count = dict(sorted(book_count.items(), key=lambda item: item[1], reverse=True))
-    top_match = list(ordered_book_count)[0]
-    top_match_info = book_info[top_match]
+    top_match_id = list(ordered_book_count)[0]
+    top_match_info = book_info[top_match_id]
     book_suggestions['top_match'] = top_match_info
 
-    print(f"\nThe mostly likely book is {top_match} by {top_match_info['author']}")
+    print(f"\nThe mostly likely book is {top_match_info['title']} by {top_match_info['author']}")
     print(f"Description: {top_match_info['description'][:500]}...")
 
 
@@ -57,7 +57,7 @@ def get_book_suggestions(chunks: list[Document]) -> list[Document]:
             if i == 0: continue
             other_suggestions.append(book_info[key])
 
-            print(f"\n{key} by {book_info[key]['author']}")
+            print(f"\n{book_info[key]['title']} by {book_info[key]['author']}")
             print(f"Description: {book_info[key]['description'][:500]}...")
         
         book_suggestions['other_suggestions'] = other_suggestions
@@ -73,4 +73,5 @@ if __name__ == '__main__':
     query = get_user_query()
     chunks =  get_top_matching_chunks(query=query)
     top_books = get_book_suggestions(chunks=chunks)
+    print(f"\n\nBook suggestions:\n{top_books}")
 
