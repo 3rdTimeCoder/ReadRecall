@@ -52,11 +52,6 @@ def load_docs(dir: str, type="epub", debug_mode=False):
     
 def main():
     print("loader.py main running...")
-    # data = load_doc("./test-docs/I_Remember_Our_Love.epub", type="epub")
-    # print(data)
-    # print(f"Pages: {len(data)}")
-    # print(f"Total characters: {len(data[0].page_content)}")
-
     load_docs("./test-docs", type="epub", debug_mode=True)
 
 
