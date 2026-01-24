@@ -21,7 +21,7 @@ def load_doc(doc: str, type="epub"):
     else: raise Exception(f"Unsupported file type: {type}")
     
     
-def load_docs(dir: str, type="epub", debug_mode=False):
+def load_docs_from_dir(dir: str, type="epub", debug_mode=False):
     """Loads all the documents in given directory"""
     print(f"Loading documents in directory {dir} initiated...")
 
@@ -48,6 +48,29 @@ def load_docs(dir: str, type="epub", debug_mode=False):
 
     
     return docs
+
+
+# def load_docs(files: list, type="epub", debug_mode=False):
+#     """Loads all the given books/files as the correct Document format/type"""
+#     print(f"Loading documents initiated...")
+    
+#     loader_cls = EPubLoader if type == "epub" else PyPDFLoader
+#     loader = DirectoryLoader(loader=loader_cls)
+
+#     docs = loader.load_files(files=files)
+
+#     if (len(docs) == 0):
+#         raise FileNotFoundError(f"No .{type} files found. Please add documents.") 
+    
+#     if debug_mode:
+#         for i, doc in enumerate(docs[:9]):
+#             # print(f"{i+1}. Source: {doc.metadata['source']}\nCharacters: {len(doc.page_content)}")
+#             # print(f"Preview: {doc.page_content.strip()[:300]}...\nMetadata: {doc.metadata}\n")
+#             print(f"{i+1}. Source: {doc.metadata['title']}\nAuthor: {doc.metadata['author']}")
+#             print(f"Metadata: {doc.metadata}\n")
+
+    
+#     return docs
 
     
 def main():

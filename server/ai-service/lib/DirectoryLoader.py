@@ -12,6 +12,10 @@ class DirectoryLoader:
         self.loader = loader
 
 
+    # def __init__(self, loader):
+    #     self.loader = loader
+
+
     def _get_files(self):
         """Return list of files in directory"""
         path = Path(self.dir_path)
@@ -28,6 +32,17 @@ class DirectoryLoader:
             docs.append(f_data)
 
         return docs
+    
+
+    # def load_files(self, files: list) -> list[Document]:
+    #     docs = []
+    #     """Loads books / files externally uploaded by user"""
+    #     for f in files:
+    #         loader = self.loader(f)
+    #         f_data = loader.load()
+    #         docs.append(f_data)
+
+    #     return docs
     
 
     def load(self):

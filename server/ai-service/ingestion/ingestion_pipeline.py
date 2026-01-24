@@ -1,6 +1,6 @@
 from typing import Union
 from pathlib import Path
-from ingestion.loaders import load_docs
+from ingestion.loaders import load_docs_from_dir
 from ingestion.chunking import chunk_docs
 from ingestion.embedding import create_vector_store, persist_chunks
 
@@ -10,14 +10,15 @@ def ingest_books(
         type="epub", 
         persist_dir="db/chroma_db",
         collection="readrecall-book-chunks",
-        is_initial_ingest=True
+        is_initial_ingest=True,
+        # is_cli=False,
     ) -> bool:
     """TODO: write docstring"""
     print("initiating book ingestion...")
 
     try:
         #1. Load files
-        files = load_docs(dir=dir_path, type=type, debug_mode=False)
+        files = load_docs_from_dir(dir=dir_path, type=type)
 
         #2. Chunk files
         chunks = chunk_docs(files, debug_mode=True)
