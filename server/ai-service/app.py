@@ -9,6 +9,7 @@ from lib.middleware.process_time import add_process_time_header
 from lib.exceptions.http import http_exception_handler
 from lib.exceptions.validation import validation_exception_error
 from lib.IngestionType import IngestionType
+from lib.responses.standard import StandardResponse, to_json
 
 
 app = FastAPI()
@@ -49,17 +50,21 @@ async def ingest(
 
             success = ingest_books(dir_path=tmp_path, type=type)
 
-    if success: 
-        return { 
-            "status": "success",
-            "message": "File ingestion successful." 
-        }
+    if success:
+        res = StandardResponse(
+            success=True,
+            data={ "message": "File ingestion unsuccessful." }
+        )
+        return to_json(res)
     else:
-        return { 
-            "code": 400,
-            "status": "error",
-            "message": "File ingestion unsuccessful." 
-        }
+        res = StandardResponse(
+            success=False,
+            error={ 
+                "code": "PROCESSING_ERROR",
+                "message": "File ingestion unsuccessful." 
+            }
+        )
+        return to_json(res, status_code=422)
     
 
 
