@@ -1,15 +1,17 @@
 from fastapi import FastAPI, File, UploadFile, Form, HTTPException
 from fastapi.exceptions import RequestValidationError
-from typing import List
+from typing import List, Annotated
 from ingestion.ingestion_pipeline import ingest_books
-from tempfile import TemporaryDirectory
-from pathlib import Path
-import shutil
+from retrieval.retrieval_pipeline import get_top_matching_chunks, get_book_suggestions
 from lib.middleware.process_time import add_process_time_header
 from lib.exceptions.http import http_exception_handler
 from lib.exceptions.validation import validation_exception_error
 from lib.IngestionType import IngestionType
 from lib.responses.standard import StandardResponse, to_json
+from tempfile import TemporaryDirectory
+from pydantic import BaseModel
+from pathlib import Path
+import shutil
 
 
 app = FastAPI()
@@ -33,9 +35,9 @@ async def root():
 
 @app.post("/ingest")
 async def ingest(
-        files: List[UploadFile] = File(...),
-        type: IngestionType = Form(...),
-    ):
+    files: List[UploadFile] = File(...),
+    type: IngestionType = Form(...),
+):
     """TODO: docstring"""
 
     success = False
@@ -65,9 +67,27 @@ async def ingest(
             }
         )
         return to_json(res, status_code=422)
-    
+
+
+class RecallRequest(BaseModel):
+    query: str
 
 
 @app.post("/recall")
-async def recall():
-    pass
+async def recall(
+    req: RecallRequest
+):
+    """TODO: write docstring"""
+
+    chunks = get_top_matching_chunks(query=req.query)
+    suggestions = get_book_suggestions(chunks=chunks)
+
+    res = StandardResponse(
+        success=True,
+        data={ 
+            "message": "Recall completed successful",
+            "results": suggestions
+        }
+    )
+
+    return to_json(res)
