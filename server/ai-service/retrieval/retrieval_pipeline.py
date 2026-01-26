@@ -18,8 +18,6 @@ def get_top_matching_chunks(query: str, debug_mode=False) -> list[Document]:
     
     chunks = query_db(query=query, k=10)
 
-    print(f"matches retrieved: {len(chunks)}")
-
     if debug_mode:
         for i,m in enumerate(chunks):
             metadata = m.metadata
@@ -27,6 +25,7 @@ def get_top_matching_chunks(query: str, debug_mode=False) -> list[Document]:
             print(f"metadata: {metadata}")
 
     return chunks
+
 
 def aggregate_similarity_scores(
         chunks: list[Tuple[Document, float]]
@@ -107,12 +106,16 @@ def display_results(results: dict) -> None:
         for book in other_suggestions:
             print(f"\nBook: {book['title']} by {book['author']}")
             print(f"Description: {book['description'][:500]}...")
+
+
+def recall(query: str):
+    chunks =  get_top_matching_chunks(query=query)
+    top_books = get_book_suggestions(chunks=chunks)
+    display_results(top_books)
     
 
 if __name__ == '__main__':
     print("Hello, welcome to ReadRecall!!!\n")
     query = get_user_query()
-    chunks =  get_top_matching_chunks(query=query)
-    top_books = get_book_suggestions(chunks=chunks)
-    display_results(top_books)
+    recall(query=query)
 
