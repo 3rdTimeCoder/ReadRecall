@@ -40,7 +40,6 @@ def aggregate_similarity_scores(
     return book_scores
 
 
-
 def calculate_scores(chunks: list[Tuple[Document, float]], book_hits: dict):
     """TODO: docstring"""
     book_scores = {}

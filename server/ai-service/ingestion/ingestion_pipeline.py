@@ -11,7 +11,6 @@ def ingest_books(
         persist_dir="db/chroma_db",
         collection="readrecall-book-chunks",
         is_initial_ingest=True,
-        # is_cli=False,
     ) -> bool:
     """TODO: write docstring"""
     print("initiating book ingestion...")
