@@ -1,9 +1,10 @@
 import { useState, type JSX } from 'react';
-import { AppContainer, BookBackground, BookVector, BookVectorContainer } from './App.styles';
+import { AppContainer, BookBackground, BookVector, BookVectorContainer, Logo, MainLayout } from './App.styles';
 import { ThemeProvider } from 'styled-components';
 import { japandiDark } from './lib/theme/theme';
 import { GlobalStyle } from './GlobalStyles';
-import SearchBar from './search-bar/SearchBar';
+import SearchBar from './components/search-bar/SearchBar';
+import FileUploader from './components/ingest/file-uploader/FileUploader';
 
 
 interface AppProps {}
@@ -18,21 +19,15 @@ function App({}: AppProps): JSX.Element {
     <ThemeProvider theme={japandiDark}>
       <GlobalStyle />
       <AppContainer>
+        <Logo><h1>ReadRecall</h1></Logo>
         <BookBackground />
-        <BookVectorContainer>
-          <BookVector />
-        </BookVectorContainer>
-        <h1>ReadRecall</h1>
+        {/* <MainLayout> */}
+          <BookVectorContainer>
+            <BookVector />
+          </BookVectorContainer>
+          <FileUploader onUpload={() => {}} />
+        {/* </MainLayout> */}
 
-        <div style={{ padding: "40px" }}>
-          <SearchBar onSearch={handleSearch} />
-
-          {/* <ul style={{ marginTop: "20px" }}>
-            {results.map((book, index) => (
-              <li key={index}>{book}</li>
-            ))}
-          </ul> */}
-        </div>
       </AppContainer>
     </ThemeProvider>
   )

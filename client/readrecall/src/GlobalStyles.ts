@@ -9,14 +9,25 @@ export const GlobalStyle = createGlobalStyle`
 
   body {
     margin: 0;
-    font-family: 'Almendra Display', serif; /* Default body font */
+    /* font-family: 'Almendra Display', serif; */
+    /* font-family: 'Almendra Display', serif; */
+    font-family: 'EB Garamond', serif;
+    font-family: 'Merriweather';
+    font-weight: 500;
     line-height: 1.6;
+    /* font-weight: 700; */
+    /* text-shadow:
+        0.5px 0 0 currentColor,
+        -0.5px 0 0 currentColor,
+        0 0.5px 0 currentColor,
+        0 -0.5px 0 currentColor; */
   }
 
   h1, h2, h3, h4, h5, h6 {
     font-family: 'UnifrakturMaguntia', cursive;
     margin-top: 0;
     margin-bottom: 1rem;
+    color: #DCB482;
   }
 
   p {
@@ -27,5 +38,42 @@ export const GlobalStyle = createGlobalStyle`
     margin-top: 0;
     margin-bottom: 1rem;
     color: ${({ theme }) => theme.colors.darkGray};
+  }
+
+  button {
+    font-family: 'Almendra Display', serif;
+    color: #DCB482;
+    border-radius: 40px;
+    width: 350px;
+    /* height: 50px; */
+    font-size: 2rem;
+    text-shadow:
+        0.5px 0 0 currentColor,
+        -0.5px 0 0 currentColor,
+        0 0.5px 0 currentColor,
+        0 -0.5px 0 currentColor;
+
+    border: 1px solid #DCB482;
+    &:hover {
+        border: 1px solid #DCB482;
+        box-shadow: 10px -25px 81px 7px rgba(0,0,0,0.43) inset;
+        -webkit-box-shadow: 10px -25px 81px 7px rgba(0,0,0,0.43) inset;
+        -moz-box-shadow: 10px -25px 81px 7px rgba(0,0,0,0.43) inset;
+    }
+
+    @media (max-width: 1280px) { 
+        width: 300px;
+        font-size: 1.5rem;
+    }
+    
+    @media (max-width: 1024px) { 
+        width: 250px;
+        font-size: 1.2rem;
+    }
+    
+    @media (max-width: 630px) {
+        width: 250px;
+        font-size: 1rem;
+    }
   }
 `;
