@@ -21,12 +21,10 @@ function App({}: AppProps): JSX.Element {
       <AppContainer>
         <Logo><h1>ReadRecall</h1></Logo>
         <BookBackground />
-        {/* <MainLayout> */}
           <BookVectorContainer>
             <BookVector />
           </BookVectorContainer>
           <FileUploader onUpload={() => {}} />
-        {/* </MainLayout> */}
 
       </AppContainer>
     </ThemeProvider>
