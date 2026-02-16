@@ -16,7 +16,7 @@ const SearchBar = ({ onSearch }: SearchBarProps): JSX.Element => {
   const handleSubmit = (e) => {
     e.preventDefault();
     handleSearch(query);
-    query && onSearch(query);
+    if (query) onSearch(query);
     clearSearch();
   };
 

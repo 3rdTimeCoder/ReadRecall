@@ -3,8 +3,9 @@ import { AppContainer, BookBackground, BookVector, BookVectorContainer, Logo, Ma
 import { ThemeProvider } from 'styled-components';
 import { japandiDark } from './lib/theme/theme';
 import { GlobalStyle } from './GlobalStyles';
-import SearchBar from './components/search-bar/SearchBar';
+// import SearchBar from './components/recall/search-bar/SearchBar';
 import FileUploader from './components/ingest/file-uploader/FileUploader';
+import Recall from './components/recall/Recall';
 
 
 interface AppProps {}
@@ -24,7 +25,8 @@ function App({}: AppProps): JSX.Element {
           <BookVectorContainer>
             <BookVector />
           </BookVectorContainer>
-          <FileUploader onUpload={() => {}} />
+          {/* <FileUploader onUpload={() => {}} /> */}
+          <Recall />
 
       </AppContainer>
     </ThemeProvider>
