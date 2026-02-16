@@ -59,31 +59,17 @@ export const Logo = styled.div`
         -webkit-box-shadow: 10px -25px 197px 7px rgba(0,0,0,0.32);
         -moz-box-shadow: 10px -25px 197px 7px rgba(0,0,0,0.32);
 
-    /* Desktop and down */
     @media (max-width: 1280px) {
         font-size: 1rem;
     }
 
-    /* Laptop and down */
-    @media (max-width: 1024px) { 
-        /* font-size: 1rem; */
-    }
+    @media (max-width: 1024px) {}
 
-    /* Tablet and down */
-    @media (max-width: 768px) {
-        /* font-size: 1rem; */
-    }
+    @media (max-width: 768px) {}
 
-    /* Mini-Tablet and down */
     @media (max-width: 630px) {
         font-size: 0.73rem;
     }
-    
-    
-
-
-    
-
 `;
 
 export const BookVector = styled.div`
@@ -92,14 +78,9 @@ export const BookVector = styled.div`
     background: url(${bookVector});
     background-size: contain;
     background-repeat: no-repeat;
-    /* border: 1px solid blue; */
     margin-left: -5rem;
 
-    /* position: absolute;
-    bottom: -60px;
-    left: -50px; */
-
-     @media (max-width: 1280px) {
+    @media (max-width: 1280px) {
         width: 460px;
         height: 470px;
     }
@@ -118,13 +99,11 @@ export const BookVector = styled.div`
 export const BookVectorContainer = styled.div`
     width: 390px;
     height: 370px;
-    /* background-color: #0a090950; */
     background-color: #DCB482;
     border-radius: 50%;
     display: grid;
     place-content: center;
     margin-bottom: 4rem;
-
 
     box-shadow: 10px -25px 81px 7px rgba(0,0,0,0.73) inset;
     -webkit-box-shadow: 10px -25px 81px 7px rgba(0,0,0,0.73) inset;
@@ -160,9 +139,4 @@ export const BookBackground = styled.div`
     opacity: 0.5;
 `;
 
-
-export const MainLayout = styled.div`
-    /* display: flex;
-    justify-content: space-around;
-    align-items: center; */
-`;
+export const MainLayout = styled.div``;

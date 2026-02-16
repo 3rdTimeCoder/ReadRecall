@@ -1,26 +1,16 @@
-// GlobalStyle.js
 import { createGlobalStyle } from 'styled-components';
 
 export const GlobalStyle = createGlobalStyle`
-  /* Apply box-sizing and resets */
   *, *::before, *::after {
     box-sizing: border-box;
   }
 
   body {
     margin: 0;
-    /* font-family: 'Almendra Display', serif; */
-    /* font-family: 'Almendra Display', serif; */
     font-family: 'EB Garamond', serif;
     font-family: 'Merriweather';
     font-weight: 500;
     line-height: 1.6;
-    /* font-weight: 700; */
-    /* text-shadow:
-        0.5px 0 0 currentColor,
-        -0.5px 0 0 currentColor,
-        0 0.5px 0 currentColor,
-        0 -0.5px 0 currentColor; */
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -45,7 +35,6 @@ export const GlobalStyle = createGlobalStyle`
     color: #DCB482;
     border-radius: 40px;
     width: 350px;
-    /* height: 50px; */
     font-size: 2rem;
     text-shadow:
         0.5px 0 0 currentColor,
@@ -67,12 +56,11 @@ export const GlobalStyle = createGlobalStyle`
     }
     
     @media (max-width: 1024px) { 
-        width: 250px;
+        width: 200px;
         font-size: 1.2rem;
     }
     
     @media (max-width: 630px) {
-        width: 250px;
         font-size: 1rem;
     }
   }

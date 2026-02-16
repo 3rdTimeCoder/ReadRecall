@@ -28,15 +28,7 @@ export const FileListContainer = styled.ul`
     padding: 0%;
     font-size: 1.1rem;
 
-    /* background-color: #DCB482; */
-
-    /* box-shadow: 10px -25px 197px 7px rgba(0,0,0,0.32);
-    -webkit-box-shadow: 10px -25px 197px 7px rgba(0,0,0,0.32);
-    -moz-box-shadow: 10px -25px 197px 7px rgba(0,0,0,0.32); */
-
-    /* border: 1px solid red; */
     scrollbar-width: none;
-  /* IE and Edge */
     -ms-overflow-style: none;
     &::-webkit-scrollbar {
         display: none;
@@ -45,18 +37,14 @@ export const FileListContainer = styled.ul`
 
 export const FileListItem = styled.li`
     display: flex;
-    /* flex-direction: column; */
-    justify-content: space-between
-    ;
-    /* padding: 1rem 2rem; */
-    /* border-bottom: 1px solid #111; */
+    justify-content: space-between;
     color: #111;
     width: 100%;
     list-style-type: none;
     border-bottom: 1px solid #dcb482ae;
     color: #DCB482;
     font-size: 1.3rem;
-    
+    gap: 1rem;
 
     & span {
         background: #DCB482;
@@ -64,8 +52,38 @@ export const FileListItem = styled.li`
         padding: 1rem 2rem;
     }
 
+    @media (max-width: 1280px) {
+        font-size: 1rem;
+    }
 
-    /* border: 1px solid blue; */
+    @media (max-width: 1024px) { 
+        font-size: 1rem;
+    }
+
+    @media (max-width: 972px) {
+        & > span {
+            padding: 0.5rem;
+        }
+    }
+
+    @media (max-width: 768px) {
+        font-size: 0.8rem;
+    }
+
+    @media (max-width: 630px) {
+        font-size: 0.73rem;
+    }
+
+    @media (max-width: 410px) { 
+        flex-direction: column;
+        gap: 0;
+
+        & > span {
+            padding: 0.25rem;
+            margin: 0;
+        }
+    }
+    
 `;
 
 export const Buttons = styled.div`
@@ -73,4 +91,8 @@ export const Buttons = styled.div`
     justify-content: center;
     align-items: center;
     gap: 1rem;
+
+    @media (max-width: 630px) {
+        flex-direction: column;
+    }
 `;
