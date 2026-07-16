@@ -20,10 +20,20 @@ def create_vector_store(
         persist_dir="db/chroma_db", 
         collection="readrecall-book-chunks"
     ) -> bool:
-    """TODO: write docstring"""
+    """Creates a new ChromaDB vector store from a list of document chunks.
 
+    Embeds the chunks using the OpenAI embedding model and persists the
+    resulting vector store to disk with cosine similarity as the distance metric.
+
+    Args:
+        chunks: The document chunks to embed and store.
+        persist_dir: Directory path for ChromaDB persistence. Defaults to 'db/chroma_db'.
+        collection: Name of the ChromaDB collection. Defaults to 'readrecall-book-chunks'.
+
+    Returns:
+        True if the vector store was created successfully, False otherwise.
+    """
     print("Embedding chunks and storing in vector db...")
-    
 
     try:
         _ = Chroma.from_documents(
@@ -45,7 +55,15 @@ def load_vector_store(
         persist_dir="db/chroma_db", 
         collection="readrecall-book-chunks"
     ) -> Chroma:
-    """TODO: write docstring"""
+    """Loads an existing ChromaDB vector store from disk.
+
+    Args:
+        persist_dir: Directory path where ChromaDB persists data. Defaults to 'db/chroma_db'.
+        collection: Name of the ChromaDB collection. Defaults to 'readrecall-book-chunks'.
+
+    Returns:
+        The loaded Chroma vector store instance.
+    """
     embedding_model = OpenAIEmbeddings(model="text-embedding-3-small")
 
     vector_store = Chroma(
@@ -62,7 +80,18 @@ def persist_chunks(
         persist_dir="db/chroma_db",
         collection="readrecall-book-chunks"
     ) -> bool:
-    """TODO: write docstring"""
+    """Appends new document chunks to an existing ChromaDB vector store.
+
+    Loads the existing vector store and adds the provided chunks to it.
+
+    Args:
+        chunks: The new document chunks to add.
+        persist_dir: Directory path for ChromaDB persistence. Defaults to 'db/chroma_db'.
+        collection: Name of the ChromaDB collection. Defaults to 'readrecall-book-chunks'.
+
+    Returns:
+        True if chunks were persisted successfully, False otherwise.
+    """
     try:
         vector_store = load_vector_store(persist_dir=persist_dir, collection=collection)
         vector_store.add_documents(chunks)
@@ -71,4 +100,3 @@ def persist_chunks(
         return False
     
     return True
-    

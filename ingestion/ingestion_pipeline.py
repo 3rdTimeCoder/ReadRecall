@@ -12,7 +12,25 @@ def ingest_books(
         collection="readrecall-book-chunks",
         is_initial_ingest=True,
     ) -> bool:
-    """TODO: write docstring"""
+    """Orchestrates the full ingestion pipeline: load, chunk, embed, and store.
+
+    Loads all documents of the given type from the specified directory,
+    splits them into semantic chunks, embeds the chunks using OpenAI's
+    text-embedding-3-small model, and persists them to a ChromaDB vector store.
+
+    Args:
+        dir_path: Directory containing the book files to ingest.
+        type: File type of the books ('epub' or 'pdf'). Defaults to 'epub'.
+        persist_dir: Directory path for the ChromaDB persistent storage.
+            Defaults to 'db/chroma_db'.
+        collection: Name of the ChromaDB collection. Defaults to
+            'readrecall-book-chunks'.
+        is_initial_ingest: If True, creates a new vector store. If False,
+            loads the existing store and appends chunks. Defaults to True.
+
+    Returns:
+        True if ingestion completed successfully, False otherwise.
+    """
     print("initiating book ingestion...")
 
     try:

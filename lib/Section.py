@@ -1,26 +1,39 @@
-
-
 class Section:
+    """Represents a single section or chapter within a book document.
+
+    Each Section holds the text content for one chapter (or document item)
+    along with its associated metadata.
+    """
 
     def __init__(self, metadata, content):
-        """
+        """Initializes a Section.
+
         Args:
-            metadata: The given section's metadata
-            content: The given section's text content
+            metadata: A dictionary containing metadata for the section,
+                including title, author, publisher, and chapter.
+            content: The plain text content of the section.
         """
         self.metadata = metadata
         self.content = content
 
     
     def get_metadata(self):
-        """Returns Section's metadata: 
-        The book title, author, publisher and chapter
+        """Returns the Section's metadata.
+
+        The metadata includes the book title, author, publisher, and chapter.
+
+        Returns:
+            A dictionary of the section's metadata.
         """
         return self.metadata
     
 
     def get_content(self):
-        """Returns the Section's content"""
+        """Returns the Section's text content.
+
+        Returns:
+            The plain text string of the section.
+        """
         return self.content
     
     

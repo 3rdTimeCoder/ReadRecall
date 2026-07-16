@@ -10,7 +10,14 @@ class RecallAction(str, Enum):
 
 
 def prompt_user(prompt: str) -> str:
-    """Prompts user"""
+    """Prompts the user for input and returns the response.
+
+    Args:
+        prompt: The message displayed to the user.
+
+    Returns:
+        The non-empty string entered by the user.
+    """
     answer = ""
     while not answer:
         answer = input(prompt)
@@ -19,6 +26,7 @@ def prompt_user(prompt: str) -> str:
 
 
 def ingest():
+    """Prompts the user for a directory path and file type, then ingests the books."""
     dir = prompt_user("Please enter the directory path: ")
     type = prompt_user("Please enter the books' file type. [epub | pdf]: ")
     success = ingest_books(dir_path=dir, type=type)
@@ -27,6 +35,7 @@ def ingest():
 
 
 def recall():
+    """Prompts the user for a query and searches the ingested library for matching books."""
     query = prompt_user("What book do you need help recalling today?\n")
     recall_book(query=query)
 
@@ -37,7 +46,12 @@ def readrecall(action):
     """
     A simple CLI tool to use ReadRecall.
 
-    TODO: Write more
+    ReadRecall identifies which book you're thinking of from your personal library
+    based on a vague memory fragment. Use the --action flag to either ingest books
+    into the library or recall a book from memory.
+
+    Args:
+        action: The action to perform — either 'ingest' or 'recall'.
     """
     click.echo(f"Welcome to ReadRecall!")
     if action == RecallAction.ingest:
