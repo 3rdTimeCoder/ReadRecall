@@ -1,0 +1,160 @@
+What this baseline does well
+✅ Proves the concept
+
+You can now recover books from vague descriptions
+
+Aggregation at the book level works
+
+✅ Simple, debuggable, fast
+
+Easy to reason about
+
+Easy to inspect failures
+
+Low latency
+
+You did the right thing by not over-engineering first.
+
+Where this will break (predictably)
+1. top_k = 10 is too small long-term
+
+With:
+
+~140 chunks per book
+
+multiple books on similar themes
+
+You’ll often see:
+
+1 chunk from many books
+
+no book accumulating enough evidence
+
+This makes results unstable.
+
+Symptom: different queries return different “top books” for similar memories.
+
+2. Pure counts ignore strength of match
+
+Right now:
+
+a weak similarity match counts the same as a strong one
+
+This causes:
+
+noise chunks to dominate
+
+long books to win by chance
+
+3. One strong chunk ≠ recall confidence
+
+A single very strong chunk should not beat:
+
+4–5 good matches from another book
+
+Your intuition already points beyond this.
+
+What to lock in (do NOT change yet)
+
+Book-level aggregation ✔
+
+Chunk-level retrieval ✔
+
+Returning multiple suggestions ✔
+
+This structure is correct.
+
+Minimal next improvements (still simple)
+1. Increase retrieval depth
+
+Change:
+
+top_k = 10
+
+
+to:
+
+top_k = 30 or 50
+
+
+This gives books room to accumulate evidence.
+
+2. Use similarity scores, not just counts
+
+Instead of:
+
+book_hits[book_id] += 1
+
+
+Use:
+
+book_score[book_id] += similarity_score
+
+
+Counts can be kept as a secondary signal.
+
+3. Cap contribution per chunk
+
+Prevent a single chunk from dominating:
+
+chunk_contribution = min(similarity_score, 0.85)
+
+A better still-simple scoring formula
+
+For each retrieved chunk:
+
+book_score[book_id] += similarity_score
+book_hits[book_id] += 1
+
+
+Final score:
+
+final_score = book_score * log(1 + book_hits)
+
+
+This:
+
+rewards multiple matches
+
+still respects strength
+
+avoids long-book bias
+
+No normalization needed yet.
+
+When to stop and test
+
+Before adding anything else:
+
+Test with real vague memories
+
+Test similar books
+
+Test edge cases (one-word memories)
+
+If it feels “mostly right,” you’re on the correct path.
+
+Important reassurance
+
+What you’ve built is not a toy RAG system.
+It’s already implementing:
+
+evidence aggregation
+
+recall confidence
+
+ranked hypothesis output
+
+That’s the hard part.
+
+Next logical steps (choose one)
+
+Add score normalization by chunks_in_book
+
+Add position-based downweighting
+
+Add book-level embeddings as a first-pass filter
+
+Add explanations (“why this book?”)
+
+Tell me which one you want to tackle next.
