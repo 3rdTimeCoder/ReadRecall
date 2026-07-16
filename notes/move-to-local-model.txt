@@ -1,0 +1,235 @@
+Alright, I've read through the full codebase. Here's my analysis and plan.
+
+## Current Architecture
+
+Your ingestion pipeline currently uses **OpenAI's `text-embedding-3-small`** via LangChain + API call. Every book ingest and every recall query sends content/text to OpenAI's servers. For copyright/privacy reasons, you want that gone — everything local.
+
+## The Core Question: Where Does the Model Run?
+
+This determines everything. There are two distinct paths:
+
+---
+
+### Path A: Backend-Hosted Local Model (Recommended)
+
+The Python backend loads a local embedding model from HuggingFace/ONNX. The webapp/APK still communicates via HTTP — but no data ever leaves your server. No API keys, no third-party calls.
+
+```
+[Webapp/Capacitor APK] → HTTP → [FastAPI Backend (Python)]
+                                    ↓
+                              [Local Embedding Model]
+                                    ↓
+                              [ChromaDB Vector Store]
+```
+
+**How to implement:**
+
+1. **Replace `langchain_openai` with `sentence-transformers`** in `ingestion/embedding.py`:
+   - Use a model like `all-MiniLM-L6-v2` (80MB, 384-dim) or `BAAI/bge-small-en-v1.5` (33MB)
+   - Both run on CPU, no GPU needed
+   - LangChain has `HuggingFaceEmbeddings` built-in — minimal code change
+   - Example swap: `OpenAIEmbeddings(...)` → `HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")`
+
+2. **Change is constrained to one file**: `ingestion/embedding.py` defines the `embedding_model` that's used by `create_vector_store`, `load_vector_store`, and `persist_chunks`. The rest of the codebase doesn't need touching.
+
+3. **Trade-offs**:
+   - ✅ No data leaves your machine
+   - ✅ No API costs
+   - ✅ Minimal code change (LangChain abstraction makes it a 2-line swap)
+   - ✅ ChromaDB stays the same
+   - ❌ Slightly lower accuracy than `text-embedding-3-large` (but `all-MiniLM-L6-v2` is surprisingly good for semantic search)
+   - ❌ Model loads into RAM (~200-500MB depending on model)
+
+**Concrete model candidates (ranked):**
+
+| Model | Size | Dims | Quality | Notes |
+|---|---|---|---|---|
+| `all-MiniLM-L6-v2` | 80MB | 384 | Good | Best speed/size tradeoff |
+| `BAAI/bge-small-en-v1.5` | 33MB | 384 | Very Good | Better than MiniLM, smaller |
+| `BAAI/bge-base-en-v1.5` | 133MB | 768 | Excellent | Near OpenAI quality |
+| `intfloat/e5-small-v2` | 130MB | 384 | Good | Requires "query: " prefix |
+
+---
+
+### Path B: On-Device Embeddings (Experimental)
+
+The embedding runs directly on the phone inside the webapp/Capacitor container.
+
+**Options for this:**
+
+| Approach | How | Viability |
+|---|---|---|
+| **ONNX Runtime Web** | Run ONNX model in browser via JS (TensorFlow.js style) | ✅ Feasible, but models need ONNX conversion |
+| **Transformer.js** | HuggingFace models directly in JS via ONNX runtime | ✅ Works, 50-100MB model download to phone |
+| **WebGPU/WebNN** | GPU-accelerated inference via browser APIs | ⚠️ Emerging tech, spotty Android support |
+| **Python on phone** | Chaquopy (Android) or PythonKit (iOS) | ❌ Heavy, complex, fights Capacitor |
+| **C++ via JNI** | llama.cpp bindings for Android | ❌ Way overkill for embeddings |
+
+**The realistic on-device path** would be:
+1. Export the embedding model to ONNX format (Python)
+2. Include ONNX model file in your Capacitor app's assets
+3. Use `onnxruntime-web` JS library in the webapp to run inference directly in the WebView
+4. Embed queries client-side, send already-embedded vectors to the backend for similarity search
+
+```
+[Webview JS] → ONNX inference → embedding vector → HTTP → [Backend: just ChromaDB search]
+```
+
+**Why this is harder:**
+- Ingestion still needs the backend — books are files, you need to chunk and embed them somewhere. Doing 10,000 chunks on a phone is impractical.
+- You'd need to sync the embedding model twice (backend for ingestion, phone for queries)
+- ChromaDB can accept pre-computed embeddings via `vector_store.add_embeddings()`
+
+---
+
+## My Recommendation
+
+**Start with Path A (backend-hosted local model)** for these reasons:
+
+1. **Minimal blast radius** — literally swap the embedding model class in one file, everything else stays the same
+2. **Your existing architecture works** — FastAPI server + ChromaDB is already set up
+3. **Capacitor APK works fine** — the webapp already calls the backend via HTTP; nothing changes
+4. **Copyright solved** — no data leaves the server
+5. **You can migrate to Path B later** if needed — the embedding abstraction is clean
+
+**Optional future hybrid**: Once Path A works, you could also add an on-device embedding option for the query path (send pre-embedded vectors to reduce payload size), while keeping ingestion on the server.
+
+---
+
+## Concrete Steps for Path A
+
+1. Add `sentence-transformers` to requirements.txt (or use `langchain-huggingface` package)
+2. In `ingestion/embedding.py`: replace `from langchain_openai import OpenAIEmbeddings` with `from langchain_huggingface import HuggingFaceEmbeddings`
+3. Change `embedding_model = OpenAIEmbeddings(model="text-embedding-3-small")` → `embedding_model = HuggingFaceEmbeddings(model_name="BAAI/bge-small-en-v1.5")`
+4. Remove the `OPEAlright, I've read through the full codebase. Here's my analysis and plan.
+
+## Current Architecture
+
+Your ingestion pipeline currently uses **OpenAI's `text-embedding-3-small`** via LangChain + API call. Every book ingest and every recall query sends content/text to OpenAI's servers. For copyright/privacy reasons, you want that gone — everything local.
+
+## The Core Question: Where Does the Model Run?
+
+This determines everything. There are two distinct paths:
+
+---
+
+### Path A: Backend-Hosted Local Model (Recommended)
+
+The Python backend loads a local embedding model from HuggingFace/ONNX. The webapp/APK still communicates via HTTP — but no data ever leaves your server. No API keys, no third-party calls.
+
+```
+[Webapp/Capacitor APK] → HTTP → [FastAPI Backend (Python)]
+                                    ↓
+                              [Local Embedding Model]
+                                    ↓
+                              [ChromaDB Vector Store]
+```
+
+**How to implement:**
+
+1. **Replace `langchain_openai` with `sentence-transformers`** in `ingestion/embedding.py`:
+   - Use a model like `all-MiniLM-L6-v2` (80MB, 384-dim) or `BAAI/bge-small-en-v1.5` (33MB)
+   - Both run on CPU, no GPU needed
+   - LangChain has `HuggingFaceEmbeddings` built-in — minimal code change
+   - Example swap: `OpenAIEmbeddings(...)` → `HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")`
+
+2. **Change is constrained to one file**: `ingestion/embedding.py` defines the `embedding_model` that's used by `create_vector_store`, `load_vector_store`, and `persist_chunks`. The rest of the codebase doesn't need touching.
+
+3. **Trade-offs**:
+   - ✅ No data leaves your machine
+   - ✅ No API costs
+   - ✅ Minimal code change (LangChain abstraction makes it a 2-line swap)
+   - ✅ ChromaDB stays the same
+   - ❌ Slightly lower accuracy than `text-embedding-3-large` (but `all-MiniLM-L6-v2` is surprisingly good for semantic search)
+   - ❌ Model loads into RAM (~200-500MB depending on model)
+
+**Concrete model candidates (ranked):**
+
+| Model | Size | Dims | Quality | Notes |
+|---|---|---|---|---|
+| `all-MiniLM-L6-v2` | 80MB | 384 | Good | Best speed/size tradeoff |
+| `BAAI/bge-small-en-v1.5` | 33MB | 384 | Very Good | Better than MiniLM, smaller |
+| `BAAI/bge-base-en-v1.5` | 133MB | 768 | Excellent | Near OpenAI quality |
+| `intfloat/e5-small-v2` | 130MB | 384 | Good | Requires "query: " prefix |
+
+---
+
+### Path B: On-Device Embeddings (Experimental)
+
+The embedding runs directly on the phone inside the webapp/Capacitor container.
+
+**Options for this:**
+
+| Approach | How | Viability |
+|---|---|---|
+| **ONNX Runtime Web** | Run ONNX model in browser via JS (TensorFlow.js style) | ✅ Feasible, but models need ONNX conversion |
+| **Transformer.js** | HuggingFace models directly in JS via ONNX runtime | ✅ Works, 50-100MB model download to phone |
+| **WebGPU/WebNN** | GPU-accelerated inference via browser APIs | ⚠️ Emerging tech, spotty Android support |
+| **Python on phone** | Chaquopy (Android) or PythonKit (iOS) | ❌ Heavy, complex, fights Capacitor |
+| **C++ via JNI** | llama.cpp bindings for Android | ❌ Way overkill for embeddings |
+
+**The realistic on-device path** would be:
+1. Export the embedding model to ONNX format (Python)
+2. Include ONNX model file in your Capacitor app's assets
+3. Use `onnxruntime-web` JS library in the webapp to run inference directly in the WebView
+4. Embed queries client-side, send already-embedded vectors to the backend for similarity search
+
+```
+[Webview JS] → ONNX inference → embedding vector → HTTP → [Backend: just ChromaDB search]
+```
+
+**Why this is harder:**
+- Ingestion still needs the backend — books are files, you need to chunk and embed them somewhere. Doing 10,000 chunks on a phone is impractical.
+- You'd need to sync the embedding model twice (backend for ingestion, phone for queries)
+- ChromaDB can accept pre-computed embeddings via `vector_store.add_embeddings()`
+
+---
+
+## My Recommendation
+
+**Start with Path A (backend-hosted local model)** for these reasons:
+
+1. **Minimal blast radius** — literally swap the embedding model class in one file, everything else stays the same
+2. **Your existing architecture works** — FastAPI server + ChromaDB is already set up
+3. **Capacitor APK works fine** — the webapp already calls the backend via HTTP; nothing changes
+4. **Copyright solved** — no data leaves the server
+5. **You can migrate to Path B later** if needed — the embedding abstraction is clean
+
+**Optional future hybrid**: Once Path A works, you could also add an on-device embedding option for the query path (send pre-embedded vectors to reduce payload size), while keeping ingestion on the server.
+
+---
+
+## Concrete Steps for Path A
+
+1. Add `sentence-transformers` to requirements.txt (or use `langchain-huggingface` package)
+2. In `ingestion/embedding.py`: replace `from langchain_openai import OpenAIEmbeddings` with `from langchain_huggingface import HuggingFaceEmbeddings`
+3. Change `embedding_model = OpenAIEmbeddings(model="text-embedding-3-small")` → `embedding_model = HuggingFaceEmbeddings(model_name="BAAI/bge-small-en-v1.5")`
+4. Remove the `OPENAI_API_KEY` env var check & getpass prompt
+5. Remove `langchain-openai` from requirements (optional cleanup)
+6. Test ingestion + recall end-to-end locally
+
+---
+
+## Questions to help refine this plan:
+
+1. **Where is the backend deployed?** Is it on your local machine, a home server, or cloud? This affects whether "local model" means "local to your machine" or "local to wherever the backend is."
+
+2. **Do you need the recall endpoint to work offline** (no internet to the backend at all), or is "no third-party API calls" sufficient?
+
+3. **How sensitive is latency?** `bge-small` takes ~10-30ms per query on a modern CPU. `all-MiniLM` is faster. Both are fine for human-scale use.
+
+4. **Do you want to eventually eliminate the backend entirely** (fully offline phone app), or is the backend as a home server acceptable?NAI_API_KEY` env var check & getpass prompt
+5. Remove `langchain-openai` from requirements (optional cleanup)
+6. Test ingestion + recall end-to-end locally
+
+---
+
+## Questions to help refine this plan:
+
+1. **Where is the backend deployed?** Is it on your local machine, a home server, or cloud? This affects whether "local model" means "local to your machine" or "local to wherever the backend is."
+
+2. **Do you need the recall endpoint to work offline** (no internet to the backend at all), or is "no third-party API calls" sufficient?
+
+3. **How sensitive is latency?** `bge-small` takes ~10-30ms per query on a modern CPU. `all-MiniLM` is faster. Both are fine for human-scale use.
+
+4. **Do you want to eventually eliminate the backend entirely** (fully offline phone app), or is the backend as a home server acceptable?
