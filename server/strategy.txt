@@ -1,0 +1,185 @@
+High-level system components
+1. Ingestion Layer (Books → Memory Units)
+
+Responsibility
+
+Convert uploaded books into searchable “memory units”
+
+Design decisions
+
+Each book is split into overlapping semantic chunks
+
+Each chunk is enriched with metadata:
+
+book identifier
+
+title
+
+author
+
+chapter or section (if available)
+
+Why
+
+Human memory latches onto scenes and concepts, not entire books
+
+Metadata enables aggregation later at the book level
+
+2. Vector Index (Semantic Memory Store)
+
+Responsibility
+
+Store embeddings of all chunks
+
+Enable similarity search against vague user memories
+
+Design decisions
+
+One global collection for all books
+
+Chunk-level embeddings
+
+Persistent local storage (MVP scope)
+
+Why
+
+Users won’t remember exact wording
+
+Semantic similarity captures “this feels like that scene I remember”
+
+3. Query Interpretation (Fuzzy Memory Input)
+
+Responsibility
+
+Accept free-form, imprecise memory descriptions
+
+Examples:
+
+“A book about power and religion in the desert”
+
+“There was a train scene and a betrayal”
+
+“Nonfiction about habits becoming identity”
+
+Design decisions
+
+Treat the input as a memory fragment, not a question
+
+Embed the input once
+
+Do not attempt intent classification at MVP stage
+
+4. Over-Retrieval Strategy (Key Insight)
+
+Responsibility
+
+Retrieve many weak matches rather than a few strong ones
+
+Design decisions
+
+Retrieve a large number of chunks across all books
+
+Accept noise
+
+Why
+
+Fuzzy memories rarely map cleanly to one chunk
+
+Multiple weak signals across the same book are meaningful
+
+This is a deliberate design choice and a key differentiator.
+
+5. Book-Level Aggregation (The Core Innovation)
+
+Responsibility
+
+Convert chunk matches into book candidates
+
+Process
+
+Group retrieved chunks by book
+
+For each book:
+
+count number of matching chunks
+
+aggregate similarity scores
+
+track spread across chapters
+
+Why
+
+One strong match can be coincidence
+
+Many moderate matches across a book reflect true recall
+
+This mirrors how humans recognize familiarity.
+
+6. Ranking & Confidence Heuristics
+
+Responsibility
+
+Rank books by likelihood
+
+Signals
+
+number of matched chunks
+
+average similarity
+
+diversity of locations in the book
+
+Output
+
+Top N candidate books
+
+Relative confidence (not absolute truth)
+
+Why
+
+The product proposes candidates, not answers
+
+Confidence is qualitative, not probabilistic
+
+7. Explanation Layer (Trust Builder)
+
+Responsibility
+
+Explain why each book was suggested
+
+Explanation content
+
+matched themes
+
+similar scenes
+
+short excerpt fragments
+
+Why
+
+Users validate memory by recognition
+
+Transparency increases trust and perceived intelligence
+
+MVP Scope (Intentionally Limited)
+Included
+
+Book upload
+
+Fuzzy memory input
+
+Top 3–5 book suggestions
+
+Short explanations
+
+Explicitly excluded
+
+Agents
+
+Conversational memory
+
+Summarization
+
+Fine-grained Q&A
+
+Recommendation systems
