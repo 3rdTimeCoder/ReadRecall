@@ -4,7 +4,21 @@ from lib import EPubLoader, DirectoryLoader
 
 
 def load_doc(doc: str, type="epub"):
-    """Load the document passed to this function"""
+    """Loads a single document from a file path.
+
+    Supports EPUB files via EPubLoader and PDF files via PyPDFLoader.
+
+    Args:
+        doc: Path to the document file.
+        type: File type of the document ('epub' or 'pdf'). Defaults to 'epub'.
+
+    Returns:
+        The loaded Document object.
+
+    Raises:
+        FileNotFoundError: If the specified path does not exist.
+        Exception: If the file type is unsupported.
+    """
     print(f"{os.path.basename(doc)} loading in initiated...")
 
     if not os.path.exists(doc):
@@ -22,7 +36,22 @@ def load_doc(doc: str, type="epub"):
     
     
 def load_docs_from_dir(dir: str, type="epub", debug_mode=False):
-    """Loads all the documents in given directory"""
+    """Loads all documents of a given type from a directory.
+
+    Uses the appropriate loader (EPubLoader or PyPDFLoader) based on the
+    specified file type and loads all matching files in the directory.
+
+    Args:
+        dir: Path to the directory containing the documents.
+        type: File type to load ('epub' or 'pdf'). Defaults to 'epub'.
+        debug_mode: If True, prints metadata for each loaded document. Defaults to False.
+
+    Returns:
+        A list of Document objects loaded from the directory.
+
+    Raises:
+        FileNotFoundError: If the directory does not exist or contains no matching files.
+    """
     print(f"Loading documents in directory {dir} initiated...")
 
     if not os.path.exists(dir):

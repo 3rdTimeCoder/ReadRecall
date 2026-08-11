@@ -97,14 +97,29 @@ class EPubLoader:
 
 
     def _parse_html(self, html: str) -> str:
-        """Returns html as text"""
+        """Parses HTML content and returns plain text.
+
+        Args:
+            html: The HTML string to parse.
+
+        Returns:
+            The plain text extracted from the HTML.
+        """
         soup = BeautifulSoup(html, "html.parser")
         text = soup.get_text('\n')
         return text
     
     
     def get_metadata(self, book: epub.EpubBook) -> dict:
-        """Extracts and returns the metadata from an epub file"""
+        """Extracts and returns the metadata from an epub file
+
+        Args:
+            book: The epub book object to extract metadata from.
+
+        Returns:
+            A dictionary containing book_id, title, author, publisher,
+            and description.
+        """
         metadata = {
             'book_id': str(uuid4()),
             'title': self._get_value(book, 'title'),
@@ -118,7 +133,18 @@ class EPubLoader:
 
 
     def _split_text_into_chapters(self, book: epub.EpubBook) -> list[Section]: 
-        """TODO: write docstring"""
+        """Splits an epub book's content into sections by document item.
+
+        Iterates over all ITEM_DOCUMENT items in the epub, extracts their
+        text content via HTML parsing, and creates Section objects with
+        metadata enriched by the chapter title.
+
+        Args:
+            book: The epub book object to split into sections.
+
+        Returns:
+            A list of Section objects, one per document item in the epub.
+        """
         doc_data = []
         metadata = self.get_metadata(book)
         # metadata.pop('description') # Commenting this out because I think its beneficial for each chunk to contain the book's description
@@ -132,7 +158,13 @@ class EPubLoader:
     
 
     def load(self):
-        """Extracts and returns the text from an epub file
+        """Extracts and returns the text from an epub file.
+
+        Reads the epub file, extracts its metadata, splits it into
+        chapter-level sections, and wraps everything in a Document object.
+
+        Returns:
+            A Document containing the book's metadata and sections.
         """
         if not os.path.exists(self.file_path):
             raise FileNotFoundError(f"Error while loading file {os.path.basename(self.file_path)}. File not found.")

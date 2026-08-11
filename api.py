@@ -44,6 +44,11 @@ app.add_exception_handler(RequestValidationError, validation_exception_error)
 # Register Routes
 @app.get("/")
 async def root():
+    """Health check endpoint.
+
+    Returns:
+        A welcome message confirming the API is running.
+    """
     return {"message": "Welcome to ReadRecall!"}
 
 
@@ -53,8 +58,19 @@ async def ingest(
     files: List[UploadFile] = File(...),
     type: IngestionType = Form(...),
 ):
-    """TODO: docstring"""
+    """Upload and ingest book files into the vector database.
 
+    Accepts one or more book files (EPUB or PDF), saves them to a temporary
+    directory, and runs the ingestion pipeline to load, chunk, embed, and
+    store them in ChromaDB.
+
+    Args:
+        files: One or more book files to upload.
+        type: The file type of the uploaded books ('epub' or 'pdf').
+
+    Returns:
+        A StandardResponse indicating whether ingestion succeeded or failed.
+    """
     success = False
 
     with TemporaryDirectory() as tmp_dir:
@@ -92,8 +108,18 @@ class RecallRequest(BaseModel):
 async def recall(
     req: RecallRequest
 ):
-    """TODO: write docstring"""
+    """Search the ingested library for books matching a memory fragment.
 
+    Embeds the user's free-form query, performs a similarity search against
+    all stored chunks, aggregates results at the book level, and returns
+    ranked book suggestions.
+
+    Args:
+        req: A JSON body containing the 'query' field with the memory fragment.
+
+    Returns:
+        A StandardResponse containing the top matching book and other suggestions.
+    """
     chunks = get_top_matching_chunks(query=req.query)
     suggestions = get_book_suggestions(chunks=chunks)
 
