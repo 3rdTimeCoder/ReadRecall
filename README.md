@@ -2,12 +2,13 @@
 
 ReadRecall identifies which book you're thinking of from your personal library — based on nothing more than a vague memory fragment.
 
-Users remember scenes, themes, quotes, or vibes — not titles or authors. ReadRecall bridges that gap.
+You remember a scene, a theme, a character name or two, maybe a weak plotline. But the title? The author? Gone. That's how human memory works — fragmented, associative, imprecise. Yet every search engine expects you to recall the one thing you've forgotten. ReadRecall bridges that gap.
 
 ## The Problem
 
-> Users remember fragments of books (scenes, themes, quotes, vibes), not titles or authors.
-> ReadRecall identifies which book they're thinking of from a personal library.
+> You remember fragments: a scene that stuck with you, a character whose name is on the tip of your tongue, a vague theme or plotline you can't quite place. But titles, authors, and precise keywords — the things search engines demand — are often the first things you forget.
+>
+> Human recall doesn't work like a database query. It works by accumulation: scattered pieces of a memory that, when gathered together, point unmistakably at the book you're thinking of. ReadRecall works the same way.
 
 ## How It Works
 
