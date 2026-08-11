@@ -1,4 +1,0 @@
-Core problem
-
-Users remember fragments of books (scenes, themes, quotes, vibes), not titles or authors.
-ReadRecall identifies which book they’re thinking of from a personal library.

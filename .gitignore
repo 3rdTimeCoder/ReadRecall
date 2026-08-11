@@ -36,7 +36,7 @@ Thumbs.db
 .env.*.local
 
 # --- Database ---
-db/chroma_db/
+backend/db/chroma_db/
 *.db
 *.sqlite
 *.sqlite3
@@ -49,9 +49,9 @@ htmlcov/
 
 # --- Project-specific ---
 # Ignore large test document files (binary test fixtures)
-test-docs/*.epub
-test-docs/*.pdf
-test-docs/*.mobi
+backend/test-docs/*.epub
+backend/test-docs/*.pdf
+backend/test-docs/*.mobi
 
 # Ingestion/processing temp files
 *.tmp
