@@ -14,6 +14,7 @@ const useReadRecall = (): ReadRecallReturn => {
     const upload = useCallback(async (files: FileList) => {
         const res = await uploadFiles(files);
         console.log(res);
+        return res;
     }, []);
 
 
