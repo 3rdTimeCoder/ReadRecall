@@ -1,0 +1,62 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg-info/
+dist/
+build/
+*.egg
+*.whl
+.mypy_cache/
+.ruff_cache/
+
+# --- Virtual environment ---
+venv/
+.venv/
+env/
+.env/
+
+# --- IDE / Editor ---
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+*.orig
+
+# --- OS ---
+.DS_Store
+Thumbs.db
+*.log
+
+# --- Environment variables ---
+.env
+.env.local
+.env.*.local
+
+# --- Database ---
+db/chroma_db/
+*.db
+*.sqlite
+*.sqlite3
+
+# --- Test artifacts ---
+test-output/
+.coverage
+htmlcov/
+.pytest_cache/
+
+# --- Project-specific ---
+# Ignore large test document files (binary test fixtures)
+test-docs/*.epub
+test-docs/*.pdf
+test-docs/*.mobi
+
+# Ingestion/processing temp files
+*.tmp
+temp/
+
+# --- Docker ---
+.docker/
+docker-compose.override.yml
