@@ -1,10 +1,10 @@
 import os
+import hashlib
 from typing import Union
 from pathlib import Path
 from ebooklib import epub
 import ebooklib
 from bs4 import BeautifulSoup
-from uuid import uuid4
 
 
 class Section:
@@ -108,6 +108,25 @@ class EPubLoader:
         soup = BeautifulSoup(html, "html.parser")
         text = soup.get_text('\n')
         return text
+
+
+    def _build_book_id(self, book: epub.EpubBook, description: str) -> str:
+        """Builds a deterministic book id for dedupe across repeated ingests.
+
+        Prefers the EPUB DC identifier when available. Falls back to a
+        hash of stable metadata fields.
+        """
+        identifier = self._get_value(book, 'identifier').strip().lower()
+
+        if identifier:
+            raw_key = f"id::{identifier}"
+        else:
+            title = self._get_value(book, 'title').strip().lower()
+            author = self._get_value(book, 'creator').strip().lower()
+            publisher = self._get_value(book, 'publisher').strip().lower()
+            raw_key = f"meta::{title}::{author}::{publisher}::{description.strip().lower()}"
+
+        return hashlib.sha256(raw_key.encode("utf-8")).hexdigest()
     
     
     def get_metadata(self, book: epub.EpubBook) -> dict:
@@ -120,19 +139,20 @@ class EPubLoader:
             A dictionary containing book_id, title, author, publisher,
             and description.
         """
+        description = self._parse_html(self._get_value(book, 'description'))
         metadata = {
-            'book_id': str(uuid4()),
+            'book_id': self._build_book_id(book, description),
             'title': self._get_value(book, 'title'),
             'author': self._get_value(book, 'creator'),
             'publisher': self._get_value(book, 'publisher'),
-            'description': self._parse_html(self._get_value(book, 'description')),
+            'description': description,
             #TODO: add cover-img later on for frontend
         }
         
         return metadata
 
 
-    def _split_text_into_chapters(self, book: epub.EpubBook) -> list[Section]: 
+    def _split_text_into_chapters(self, book: epub.EpubBook, metadata: dict) -> list[Section]: 
         """Splits an epub book's content into sections by document item.
 
         Iterates over all ITEM_DOCUMENT items in the epub, extracts their
@@ -146,12 +166,12 @@ class EPubLoader:
             A list of Section objects, one per document item in the epub.
         """
         doc_data = []
-        metadata = self.get_metadata(book)
         # metadata.pop('description') # Commenting this out because I think its beneficial for each chunk to contain the book's description
 
         for item in book.get_items_of_type(ebooklib.ITEM_DOCUMENT):
             text = self._parse_html(item.get_content())
-            updated_metadata = { **metadata, 'chapter':  text.strip()[:100].split('\n')[0] }
+            chapter_title = text.strip()[:100].split('\n')[0].strip()
+            updated_metadata = { **metadata, 'chapter': chapter_title }
             doc_data.append(Section(updated_metadata, text.strip()))
 
         return doc_data
@@ -172,7 +192,7 @@ class EPubLoader:
         book = epub.read_epub(self.file_path)
         metadata = self.get_metadata(book)
 
-        doc_sections = self._split_text_into_chapters(book)
+        doc_sections = self._split_text_into_chapters(book, metadata)
         doc_data = Document(metadata, doc_sections)
         return doc_data
         
